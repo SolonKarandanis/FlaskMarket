@@ -7,3 +7,5 @@ A Flask app
 - export FLASK_DEBUG=1
 
 - flask run
+
+- python run.py
