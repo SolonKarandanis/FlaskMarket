@@ -54,6 +54,7 @@ class Product(db.Model):
     __tablename__ = 'product'
 
     id = db.Column(db.Integer, primary_key=True)
+    sku = db.Column(db.String(length=255), nullable=False)
     name = db.Column(db.String(length=30), nullable=False)
     supplier = db.Column(db.String(length=30), nullable=False)
     description = db.Column(db.Text(), nullable=False)
@@ -64,7 +65,7 @@ class Product(db.Model):
 
 
 class Cart(db.Model):
-    __tablename__ = ' carts'
+    __tablename__ = 'carts'
 
     id = db.Column(db.Integer, primary_key=True)
     total_price = db.Column(db.Float)
@@ -72,12 +73,31 @@ class Cart(db.Model):
     date_created = db.Column(db.Date())
     date_modified = db.Column(db.Date())
 
+    def __repr__(self):
+        return f"<Cart {self.id}>"
+
 
 class CartItem(db.Model):
-    __tablename__ = ' cart_items'
+    __tablename__ = 'cart_items'
 
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer)
     modification_alert = db.Column(db.Boolean())
     unit_price = db.Column(db.Float)
     total_price = db.Column(db.Float)
+
+    def __repr__(self):
+        return f"<CartItem {self.id}>"
+
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.Date())
+    status = db.Column(db.String(length=40))
+    total_price = db.Column(db.Float)
+
+    def __repr__(self):
+        return f"<Order {self.id}>"
+    
