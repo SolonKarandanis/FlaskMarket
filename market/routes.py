@@ -14,7 +14,7 @@ def home_page():
 @app.route('/market')
 @login_required
 def market_page():
-    products = Product.query.filter_by(owner=current_user.id)
+    products = Product.query.all()
     return render_template('market.html', products=products)
 
 

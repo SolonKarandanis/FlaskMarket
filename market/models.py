@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     email_address = db.Column(db.String(length=50), nullable=False, unique=True)
     password_hash = db.Column(db.String(length=60), nullable=False)
     budget = db.Column(db.Integer(), nullable=False, default=1000)
-    products = db.relationship('Product', backref='owned_user', lazy=True)
+    # products = db.relationship('Product', backref='owned_user', lazy=True)
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -57,7 +57,27 @@ class Product(db.Model):
     name = db.Column(db.String(length=30), nullable=False)
     supplier = db.Column(db.String(length=30), nullable=False)
     description = db.Column(db.Text(), nullable=False)
-    owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    # owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
 
     def __repr__(self):
         return f"<Product {self.name}>"
+
+
+class Cart(db.Model):
+    __tablename__ = ' carts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    total_price = db.Column(db.Float)
+    modification_alert = db.Column(db.Boolean())
+    date_created = db.Column(db.Date())
+    date_modified = db.Column(db.Date())
+
+
+class CartItem(db.Model):
+    __tablename__ = ' cart_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.Integer)
+    modification_alert = db.Column(db.Boolean())
+    unit_price = db.Column(db.Float)
+    total_price = db.Column(db.Float)
