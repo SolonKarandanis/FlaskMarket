@@ -1,8 +1,8 @@
 from market import app, db
 from flask import render_template, redirect, url_for, flash
-from market.models import Product, User
+from market.models import Product, User, Type
 from market.forms import RegisterForm, LoginForm
-from flask_login import login_user,logout_user,login_required,current_user
+from flask_login import login_user, logout_user, login_required, current_user
 
 
 @app.route('/')
@@ -11,11 +11,19 @@ def home_page():
     return render_template('home.html')
 
 
+# user = session.query(User).filter_by(name=name).first()
 @app.route('/market')
 @login_required
 def market_page():
-    products = Product.query.all()
+    products = db.session.query(Product).all()
     return render_template('market.html', products=products)
+
+
+@app.route('/product/<int:product_id>/', methods=['GET'])
+@login_required
+def product_detail_page(product_id):
+    product = db.session.query(Product).options(db.joinedload(Product.types)).filter_by(id=product_id).first()
+    return render_template('product.html', product=product)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -55,5 +63,5 @@ def login_page():
 @app.route('/logout')
 def logout_page():
     logout_user()
-    flash("You have been logged out",category='info')
+    flash("You have been logged out", category='info')
     return redirect(url_for('home_page'))

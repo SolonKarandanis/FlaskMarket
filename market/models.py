@@ -1,3 +1,5 @@
+from typing import Set
+
 from market import db, login_manager
 from market import bcrypt
 from flask_login import UserMixin
@@ -16,6 +18,7 @@ class User(db.Model, UserMixin):
     email_address = db.Column(db.String(length=50), nullable=False, unique=True)
     password_hash = db.Column(db.String(length=60), nullable=False)
     budget = db.Column(db.Integer(), nullable=False, default=1000)
+
     # products = db.relationship('Product', backref='owned_user', lazy=True)
 
     def __repr__(self):
@@ -40,17 +43,29 @@ class User(db.Model, UserMixin):
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
 
 
-class ProductType(db.Model):
-    __tablename__ = 'product_type'
+class ProductTypeBase(db.DeclarativeBase):
+    pass
+
+
+product_type = db.Table(
+    "product_type",
+    ProductTypeBase.metadata,
+    db.Column("type_id", db.ForeignKey("type.id"), primary_key=True),
+    db.Column("product_id", db.ForeignKey("product.id"), primary_key=True),
+)
+
+
+class Type(ProductTypeBase):
+    __tablename__ = 'type'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(length=30), nullable=False)
+    type_name = db.Column(db.String(length=30), nullable=False)
 
     def __repr__(self):
-        return f"<ProductType {self.name}>"
+        return f"<Type {self.name}>"
 
 
-class Product(db.Model):
+class Product(ProductTypeBase):
     __tablename__ = 'product'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -58,6 +73,8 @@ class Product(db.Model):
     name = db.Column(db.String(length=30), nullable=False)
     supplier = db.Column(db.String(length=30), nullable=False)
     description = db.Column(db.Text(), nullable=False)
+    types: db.Mapped[Set[Type]] = db.relationship(secondary=product_type)
+
     # owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
 
     def __repr__(self):

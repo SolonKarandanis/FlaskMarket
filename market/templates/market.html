@@ -15,6 +15,7 @@
                         <!-- Your Columns HERE -->
                         <th scope="col">ID</th>
                         <th scope="col">Name</th>
+                        <th scope="col">SKU</th>
                         <th scope="col">Supplier</th>
                         <th scope="col">Descriptions</th>
                         <th scope="col">Options</th>
@@ -26,10 +27,11 @@
                         <tr>
                             <td>{{ product.id }}</td>
                             <td>{{ product.name }}</td>
+                            <td>{{ product.sku }}</td>
                             <td>{{ product.description }}</td>
-                            <td>{{ product.supplier }}$</td>
+                            <td>{{ product.supplier }}</td>
                             <td>
-                                <button class="btn btn-outline btn-info">More Info</button>
+                                <a class="btn btn-outline btn-info"  href="{{ url_for('product_detail_page',product_id=product.id) }}">More Info</a>
                                 <button class="btn btn-outline btn-success">Purchase this Item</button>
                             </td>
                         </tr>
