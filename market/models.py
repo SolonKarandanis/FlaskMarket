@@ -73,9 +73,18 @@ class Product(ProductTypeBase):
     name = db.Column(db.String(length=30), nullable=False)
     supplier = db.Column(db.String(length=30), nullable=False)
     description = db.Column(db.Text(), nullable=False)
+    price = db.Column(db.Float)
     types: db.Mapped[Set[Type]] = db.relationship(secondary=product_type)
 
-    # owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
+    @property
+    def inline_types(self):
+        types_list = list(self.types)
+        if len(types_list) == 1:
+            return types_list[0].type_name
+        else:
+            type_names = [tl.type_name for tl in types_list]
+            comma_separated_strings = ','.join(type_names)
+            return comma_separated_strings
 
     def __repr__(self):
         return f"<Product {self.name}>"
