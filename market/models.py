@@ -96,8 +96,8 @@ class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     total_price = db.Column(db.Float)
     modification_alert = db.Column(db.Boolean())
-    date_created = db.Column(db.Date())
-    date_modified = db.Column(db.Date())
+    date_created = db.Column(db.DateTime(timezone=True))
+    date_modified = db.Column(db.DateTime(timezone=True))
 
     def __repr__(self):
         return f"<Cart {self.id}>"

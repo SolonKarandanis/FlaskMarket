@@ -3,6 +3,9 @@ from flask import render_template, redirect, url_for, flash
 from market.models import Product, User, Type
 from market.forms import RegisterForm, LoginForm
 from flask_login import login_user, logout_user, login_required, current_user
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @app.route('/')
@@ -16,6 +19,7 @@ def home_page():
 @login_required
 def market_page():
     products = db.session.query(Product).all()
+    logger.info('Loaded products')
     return render_template('market.html', products=products)
 
 
@@ -52,6 +56,7 @@ def login_page():
                 attempted_password=form.password.data
         ):
             login_user(attempted_user)
+            logger.info(f'User logged in as: {attempted_user.username}')
             flash(f'Success! You are logged in as: {attempted_user.username}', category='success')
             return redirect(url_for('market_page'))
         else:
@@ -65,3 +70,54 @@ def logout_page():
     logout_user()
     flash("You have been logged out", category='info')
     return redirect(url_for('home_page'))
+
+# @app.route('/create/', methods=('GET', 'POST'))
+# def create():
+#     if request.method == 'POST':
+#         firstname = request.form['firstname']
+#         lastname = request.form['lastname']
+#         email = request.form['email']
+#         age = int(request.form['age'])
+#         bio = request.form['bio']
+#         student = Student(firstname=firstname,
+#                           lastname=lastname,
+#                           email=email,
+#                           age=age,
+#                           bio=bio)
+#         db.session.add(student)
+#         db.session.commit()
+#
+#         return redirect(url_for('index'))
+#
+#     return render_template('create.html')
+
+# @app.route('/<int:student_id>/edit/', methods=('GET', 'POST'))
+# def edit(student_id):
+#     student = Student.query.get_or_404(student_id)
+#
+#     if request.method == 'POST':
+#         firstname = request.form['firstname']
+#         lastname = request.form['lastname']
+#         email = request.form['email']
+#         age = int(request.form['age'])
+#         bio = request.form['bio']
+#
+#         student.firstname = firstname
+#         student.lastname = lastname
+#         student.email = email
+#         student.age = age
+#         student.bio = bio
+#
+#         db.session.add(student)
+#         db.session.commit()
+#
+#         return redirect(url_for('index'))
+#
+#     return render_template('edit.html', student=student)
+
+# @app.post('/<int:student_id>/delete/')
+# def delete(student_id):
+#     student = Student.query.get_or_404(student_id)
+#     db.session.delete(student)
+#     db.session.commit()
+#     return redirect(url_for('index'))
