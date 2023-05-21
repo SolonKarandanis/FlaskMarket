@@ -1,5 +1,5 @@
 from market import app, db
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from market.models import Product, User, Type
 from market.forms import RegisterForm, LoginForm
 from flask_login import login_user, logout_user, login_required, current_user
@@ -18,10 +18,10 @@ def home_page():
 @app.route('/market')
 @login_required
 def market_page():
-    products = db.session.query(Product).all()
+    page = request.args.get('page', 1, type=int)
+    pagination = db.session.query(Product).order_by(Product.id).paginate(page=page, per_page=5)
     logger.info('Loaded products')
-    return render_template('market.html', products=products)
-
+    return render_template('market.html', pagination=pagination)
 
 @app.route('/product/<int:product_id>/', methods=['GET'])
 @login_required

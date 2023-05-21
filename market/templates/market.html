@@ -23,7 +23,7 @@
                 </thead>
                 <tbody>
                     <!-- Your rows inside the table HERE: -->
-                    {% for product in products %}
+                    {% for product in pagination.items %}
                         <tr>
                             <td>{{ product.id }}</td>
                             <td>{{ product.name }}</td>
@@ -38,22 +38,37 @@
                     {% endfor %}
                 </tbody>
                 <tfoot>
-                  <nav aria-label="Page navigation example">
+                  <nav aria-label="Page navigation example" style="display:flex;justify-content: space-between;">
                       <ul class="pagination">
-                        <li class="page-item">
-                          <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                          </a>
-                        </li>
-                        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                          <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                          </a>
-                        </li>
+                          {% if pagination.has_prev %}
+                              <li class="page-item">
+                                  <a class="page-link" href="{{ url_for('market_page',page=pagination.prev_num) }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                  </a>
+                              </li>
+                          {% endif %}
+                          {% for page in pagination.iter_pages() %}
+                            {% if page != pagination.page %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('market_page',page=page) }}">{{page}}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link" href="{{ url_for('market_page',page=page) }}">{{page}}</a>
+                                </li>
+                            {% endif %}
+                          {% endfor %}
+                          {% if pagination.has_next %}
+                              <li class="page-item">
+                                  <a class="page-link" href="{{ url_for('market_page',page=pagination.next_num) }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                  </a>
+                              </li>
+                          {% endif %}
                       </ul>
+                      <span class="badge  badge-info" style="height: fit-content;">
+                          {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
+                      </span>
                     </nav>
                 </tfoot>
             </table>
