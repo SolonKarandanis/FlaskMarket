@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 
+
 app = Flask(__name__)
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(name)s: %(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
