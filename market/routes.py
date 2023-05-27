@@ -15,7 +15,7 @@ def home_page():
 
 
 # user = session.query(User).filter_by(name=name).first()
-@app.route('/market')
+@app.route('/market', methods=['GET', 'POST'])
 @login_required
 def market_page():
     page = request.args.get('page', 1, type=int)
