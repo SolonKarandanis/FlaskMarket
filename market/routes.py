@@ -1,7 +1,7 @@
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 from market.models import Product, User, Type
-from market.forms import RegisterForm, LoginForm
+from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 
@@ -21,7 +21,19 @@ def market_page():
     page = request.args.get('page', 1, type=int)
     pagination = db.session.query(Product).order_by(Product.id).paginate(page=page, per_page=5)
     logger.info('Loaded products')
-    return render_template('market.html', pagination=pagination)
+    productList_form = ProductListAddToCartForm()
+    for product in pagination.items:
+        product_form = ProductAddToCartForm()
+        product_form.selected= False
+        product_form.id = product.id
+        product_form.sku = product.sku
+        product_form.name = product.name
+        product_form.supplier = product.supplier
+        product_form.description = product.description
+        product_form.price = product.price
+        productList_form.products.append_entry(product_form)
+    return render_template('market.html', productList_form=productList_form, pagination=pagination)
+
 
 @app.route('/product/<int:product_id>/', methods=['GET'])
 @login_required
@@ -67,8 +79,12 @@ def login_page():
             return redirect(url_for('market_page'))
         else:
             flash('Username and password are not match! Please try again', category='danger')
-
     return render_template('login.html', form=form)
+
+
+@app.route('/cart', methods=['GET', 'POST'])
+def cart():
+    pass
 
 
 @app.route('/logout')

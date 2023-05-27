@@ -9,70 +9,92 @@
             <h2>Available items on the Market</h2>
            <p>Click on one of the items to start buying</p>
            <br>
-            <table class="table table-hover table-dark">
-                <thead>
-                    <tr>
-                        <!-- Your Columns HERE -->
-                        <th scope="col">ID</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">SKU</th>
-                        <th scope="col">Supplier</th>
-                        <th scope="col">Descriptions</th>
-                        <th scope="col">Options</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Your rows inside the table HERE: -->
-                    {% for product in pagination.items %}
+            <form action="" method="post" name="add">
+                <table class="table table-hover table-dark">
+                    <thead>
                         <tr>
-                            <td>{{ product.id }}</td>
-                            <td>{{ product.name }}</td>
-                            <td>{{ product.sku }}</td>
-                            <td>{{ product.description }}</td>
-                            <td>{{ product.supplier }}</td>
-                            <td>
-                                <a class="btn btn-outline btn-info"  href="{{ url_for('product_detail_page',product_id=product.id) }}">More Info</a>
-                                <button class="btn btn-outline btn-success">Purchase this Item</button>
-                            </td>
+                            <!-- Your Columns HERE -->
+                            <th scope="col">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="checkAll">
+                                    <label class="form-check-label" for="checkAll">
+                                        Select All
+                                    </label>
+                                </div>
+                            </th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">SKU</th>
+                            <th scope="col">Supplier</th>
+                            <th scope="col">Descriptions</th>
+                            <th scope="col">Price</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot>
-                  <nav aria-label="Page navigation example" class="pagination">
-                      <ul class="pagination">
-                          {% if pagination.has_prev %}
-                              <li class="page-item">
-                                  <a class="page-link" href="{{ url_for('market_page',page=pagination.prev_num) }}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                  </a>
-                              </li>
-                          {% endif %}
-                          {% for page in pagination.iter_pages() %}
-                            {% if page != pagination.page %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('market_page',page=page) }}">{{page}}</a>
-                                </li>
-                            {% else %}
-                                <li class="page-item active" aria-current="page">
-                                    <a class="page-link" href="{{ url_for('market_page',page=page) }}">{{page}}</a>
-                                </li>
-                            {% endif %}
-                          {% endfor %}
-                          {% if pagination.has_next %}
-                              <li class="page-item">
-                                  <a class="page-link" href="{{ url_for('market_page',page=pagination.next_num) }}" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                  </a>
-                              </li>
-                          {% endif %}
-                      </ul>
-                      <span class="badge  badge-info" style="height: fit-content;">
-                          {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
-                      </span>
-                    </nav>
-                </tfoot>
-            </table>
-
+                    </thead>
+                    <tbody>
+                        <!-- Your rows inside the table HERE: -->
+                        {% for product_form, product in zip(productList_form.products, pagination.items) %}
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        {{product_form.selected(class="form-check-input")}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-outline">
+                                        {{product_form.quantity(class="form-control")}}
+                                    </div>
+                                </td>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>
+                                    <a >
+                                       {{ product.sku }}
+                                    </a>
+                                </td>
+                                <td>{{ product.description}}</td>
+                                <td>{{ product.supplier }}</td>
+                                <td>{{ product.price }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                      <nav aria-label="Page navigation example" class="pagination">
+                          <ul class="pagination">
+                              {% if pagination.has_prev %}
+                                  <li class="page-item">
+                                      <a class="page-link" href="{{ url_for('market_page',page=pagination.prev_num) }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                      </a>
+                                  </li>
+                              {% endif %}
+                              {% for page in pagination.iter_pages() %}
+                                {% if page != pagination.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('market_page',page=page) }}">{{page}}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item active" aria-current="page">
+                                        <a class="page-link" href="{{ url_for('market_page',page=page) }}">{{page}}</a>
+                                    </li>
+                                {% endif %}
+                              {% endfor %}
+                              {% if pagination.has_next %}
+                                  <li class="page-item">
+                                      <a class="page-link" href="{{ url_for('market_page',page=pagination.next_num) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                      </a>
+                                  </li>
+                              {% endif %}
+                          </ul>
+                          <span class="badge  badge-info" style="height: fit-content;">
+                              {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
+                          </span>
+                      </nav>
+                    </tfoot>
+                </table>
+                {{ productList_form.add_to_cart(class="btn btn-primary btn-lg") }}
+            </form>
         </div>
         <div class="col-4">
             <h2>Owned Items</h2>
@@ -80,5 +102,6 @@
             <br>
         </div>
     </div>
+
 
 {% endblock %}

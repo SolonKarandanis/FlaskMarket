@@ -12,6 +12,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://sales_db:sales_db@192.168.1.5:5432/sales_db"
 app.config['SECRET_KEY'] = 'ec9439cfc6c796ae2029594d'
+app.jinja_env.globals.update(zip=zip)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
