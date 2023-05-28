@@ -155,3 +155,6 @@ def logout_page():
 #     db.session.delete(student)
 #     db.session.commit()
 #     return redirect(url_for('index'))
+
+#q = session.query(Item.id).filter(Item.email==email)
+#session.query(q.exists()).scalar()    # returns True or False
