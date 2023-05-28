@@ -48,7 +48,7 @@
                                 <td>{{ product.id }}</td>
                                 <td>{{ product.name }}</td>
                                 <td>
-                                    <a >
+                                    <a href="{{ url_for('product_detail_page',product_id=product.id) }}">
                                        {{ product.sku }}
                                     </a>
                                 </td>

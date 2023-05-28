@@ -1,6 +1,8 @@
+from datetime import datetime
+
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
-from market.models import Product, User, Type
+from market.models import Product, User, Cart
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
@@ -24,7 +26,7 @@ def market_page():
     productList_form = ProductListAddToCartForm()
     for product in pagination.items:
         product_form = ProductAddToCartForm()
-        product_form.selected= False
+        product_form.selected = False
         product_form.id = product.id
         product_form.sku = product.sku
         product_form.name = product.name
@@ -84,7 +86,17 @@ def login_page():
 
 @app.route('/cart', methods=['GET', 'POST'])
 def cart():
-    pass
+    if request.method == 'GET':
+        user_id = current_user.id
+        cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+        if cart is None:
+            cart = Cart(users_id=user_id,
+                        total_price=0,
+                        date_created=datetime.now(),
+                        date_modified=datetime.now())
+            db.session.add(cart)
+            db.session.commit()
+        return render_template('cart.html', cart=cart)
 
 
 @app.route('/logout')

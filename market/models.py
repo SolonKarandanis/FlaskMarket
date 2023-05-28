@@ -93,12 +93,13 @@ class Product(ProductTypeBase):
 class Cart(db.Model):
     __tablename__ = 'carts'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.Sequence("carts_sq", start=1), primary_key=True)
     total_price = db.Column(db.Float)
     modification_alert = db.Column(db.Boolean())
     date_created = db.Column(db.DateTime(timezone=True))
     date_modified = db.Column(db.DateTime(timezone=True))
     cart_items = db.relationship('CartItem', backref="cart")
+    users_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
 
     def __repr__(self):
