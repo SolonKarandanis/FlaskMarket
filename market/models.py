@@ -98,6 +98,8 @@ class Cart(db.Model):
     modification_alert = db.Column(db.Boolean())
     date_created = db.Column(db.DateTime(timezone=True))
     date_modified = db.Column(db.DateTime(timezone=True))
+    cart_items = db.relationship('CartItem', backref="cart")
+
 
     def __repr__(self):
         return f"<Cart {self.id}>"
@@ -111,6 +113,8 @@ class CartItem(db.Model):
     modification_alert = db.Column(db.Boolean())
     unit_price = db.Column(db.Float)
     total_price = db.Column(db.Float)
+    carts_id = db.Column(db.Integer, db.ForeignKey(Cart.id))
+    products_id = db.Column(db.Integer, db.ForeignKey(Product.id))
 
     def __repr__(self):
         return f"<CartItem {self.id}>"
