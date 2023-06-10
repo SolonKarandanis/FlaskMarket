@@ -37,12 +37,6 @@ class LoginForm(FlaskForm):
 class ProductAddToCartForm(FlaskForm):
     selected = BooleanField()
     quantity = IntegerField()
-    id = IntegerField()
-    sku = StringField()
-    name = StringField()
-    supplier = StringField()
-    description = TextAreaField()
-    price = FloatField()
 
 
 class ProductListAddToCartForm(FlaskForm):
