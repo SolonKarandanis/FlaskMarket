@@ -101,6 +101,19 @@ class Cart(db.Model):
     cart_items = db.relationship('CartItem', backref="cart")
     users_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
+    def add_item_to_cart(self, products_id, quantity, price):
+        existing_cart_item = next(filter(lambda ci: ci.products_id == products_id, self.cart_items), None)
+        if existing_cart_item is None:
+            cart_item = CartItem(quantity=quantity,
+                                 modification_alert=False,
+                                 unit_price=price,
+                                 total_price=quantity * price,
+                                 products_id=products_id)
+            self.cart_items.append(cart_item)
+        else:
+            new_quantity = existing_cart_item.quantity + quantity
+            existing_cart_item.quantity = new_quantity
+            existing_cart_item.total_price = new_quantity * price
 
     def __repr__(self):
         return f"<Cart {self.id}>"
@@ -109,7 +122,7 @@ class Cart(db.Model):
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer,db.Sequence("cart_items_sq", start=1), primary_key=True)
     quantity = db.Column(db.Integer)
     modification_alert = db.Column(db.Boolean())
     unit_price = db.Column(db.Float)

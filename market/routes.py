@@ -24,6 +24,27 @@ def market_page():
     pagination = db.session.query(Product).order_by(Product.id).paginate(page=page, per_page=5)
     logger.info('Loaded products')
     productList_form = ProductListAddToCartForm()
+
+    if request.method == 'POST':
+        user_id = current_user.id
+        cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+        if cart is None:
+            cart = Cart(users_id=user_id,
+                        total_price=0,
+                        date_created=datetime.now(),
+                        cart_items=[])
+
+        for product, product_form in zip(pagination.items, productList_form.products):
+            is_selected = product_form.selected.data
+            quantity = product_form.quantity.data
+            if is_selected:
+                cart.add_item_to_cart(product.id, quantity, product.price)
+
+        db.session.add(cart)
+        db.session.commit()
+
+        return redirect(url_for('cart'))
+
     for product in pagination.items:
         product_form = ProductAddToCartForm()
         product_form.selected = False

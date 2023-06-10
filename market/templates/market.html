@@ -10,6 +10,7 @@
            <p>Click on one of the items to start buying</p>
            <br>
             <form action="" method="post" name="add">
+                {{ productList_form.csrf_token}}
                 <table class="table table-hover table-dark">
                     <thead>
                         <tr>
@@ -45,7 +46,7 @@
                                         {{product_form.quantity(class="form-control")}}
                                     </div>
                                 </td>
-                                <td>{{ product.id }}</td>
+                                <td>{{product.id}}</td>
                                 <td>{{ product.name }}</td>
                                 <td>
                                     <a href="{{ url_for('product_detail_page',product_id=product.id) }}">

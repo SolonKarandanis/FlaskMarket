@@ -5,4 +5,11 @@
 
 {% block content %}
 {{ cart.id }}
+
+{% for cart_item in cart.cart_items%}
+  {{cart_item.id}}
+  {{cart_item.products_id}}
+  {{cart_item.quantity}}
+  {{cart_item.total_price}}
+{% endfor%}
 {% endblock %}
