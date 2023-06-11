@@ -76,6 +76,7 @@ class Product(ProductTypeBase):
     price = db.Column(db.Float)
     types: db.Mapped[Set[Type]] = db.relationship(secondary=product_type)
 
+
     @property
     def inline_types(self):
         types_list = list(self.types)
@@ -115,6 +116,9 @@ class Cart(db.Model):
             existing_cart_item.quantity = new_quantity
             existing_cart_item.total_price = new_quantity * price
 
+    def update_cart_total_price(self):
+        self.total_price = sum(ci.total_price for ci in self.cart_items)
+
     def __repr__(self):
         return f"<Cart {self.id}>"
 
@@ -122,13 +126,14 @@ class Cart(db.Model):
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
 
-    id = db.Column(db.Integer,db.Sequence("cart_items_sq", start=1), primary_key=True)
+    id = db.Column(db.Integer, db.Sequence("cart_items_sq", start=1), primary_key=True)
     quantity = db.Column(db.Integer)
     modification_alert = db.Column(db.Boolean())
     unit_price = db.Column(db.Float)
     total_price = db.Column(db.Float)
     carts_id = db.Column(db.Integer, db.ForeignKey(Cart.id))
     products_id = db.Column(db.Integer, db.ForeignKey(Product.id))
+    product = db.relationship(Product, backref="cart_items")
 
     def __repr__(self):
         return f"<CartItem {self.id}>"

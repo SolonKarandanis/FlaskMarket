@@ -2,7 +2,7 @@ from datetime import datetime
 
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
-from market.models import Product, User, Cart
+from market.models import Product, User, Cart, CartItem
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
@@ -39,7 +39,7 @@ def market_page():
             quantity = product_form.quantity.data
             if is_selected:
                 cart.add_item_to_cart(product.id, quantity, product.price)
-
+        cart.update_cart_total_price()
         db.session.add(cart)
         db.session.commit()
 
@@ -110,7 +110,8 @@ def login_page():
 def cart():
     if request.method == 'GET':
         user_id = current_user.id
-        cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+        cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product))\
+            .filter_by(users_id=user_id).first()
         if cart is None:
             cart = Cart(users_id=user_id,
                         total_price=0,
