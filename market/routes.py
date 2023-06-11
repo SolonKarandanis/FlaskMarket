@@ -106,6 +106,7 @@ def login_page():
 
 
 @app.route('/cart', methods=['GET', 'POST'])
+@login_required
 def cart():
     if request.method == 'GET':
         user_id = current_user.id
