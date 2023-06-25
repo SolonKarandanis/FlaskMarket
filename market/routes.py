@@ -110,7 +110,7 @@ def login_page():
 def cart():
     if request.method == 'GET':
         user_id = current_user.id
-        cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product))\
+        cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
             .filter_by(users_id=user_id).first()
         if cart is None:
             cart = Cart(users_id=user_id,
@@ -127,6 +127,19 @@ def logout_page():
     logout_user()
     flash("You have been logged out", category='info')
     return redirect(url_for('home_page'))
+
+
+# Custom Error Pages
+# Invalid URL
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
+
+
+# Internal Server Error
+@app.errorhandler(500)
+def page_not_found(error):
+    return render_template("500.html"), 500
 
 # @app.route('/create/', methods=('GET', 'POST'))
 # def create():
@@ -179,5 +192,5 @@ def logout_page():
 #     db.session.commit()
 #     return redirect(url_for('index'))
 
-#q = session.query(Item.id).filter(Item.email==email)
-#session.query(q.exists()).scalar()    # returns True or False
+# q = session.query(Item.id).filter(Item.email==email)
+# session.query(q.exists()).scalar()    # returns True or False
