@@ -41,9 +41,14 @@ def market_page():
                 cart.add_item_to_cart(product.id, quantity, product.price)
         cart.update_cart_total_price()
         db.session.add(cart)
-        db.session.commit()
 
-        return redirect(url_for('cart'))
+        try:
+            db.session.commit()
+            return redirect(url_for('cart'))
+        except:
+            flash("Error while adding items to cart")
+
+        return redirect(url_for('market_page'))
 
     for product in pagination.items:
         product_form = ProductAddToCartForm()
@@ -118,7 +123,11 @@ def cart():
                         date_created=datetime.now(),
                         date_modified=datetime.now())
             db.session.add(cart)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except:
+                flash("Error while fetching  cart")
+
         return render_template('cart.html', cart=cart)
 
 
