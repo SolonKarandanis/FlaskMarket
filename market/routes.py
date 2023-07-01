@@ -152,16 +152,17 @@ def cart():
 
 
 @app.post('/cart/<int:item_id>/delete/')
+@login_required
 def delete_cart_item(item_id):
     user_id = current_user.id
     cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
-    cart.delete_item_from_cart(item_id)
+    cart_item = next(filter(lambda ci: ci.id == item_id, cart.cart_items), None)
+    db.session.delete(cart_item)
     cart.update_cart_total_price()
-    db.session.add(cart)
     try:
         db.session.commit()
     except:
-        flash("Error while adding items to cart")
+        flash("Error while deleting item from cart")
     return redirect(url_for('cart'))
 
 

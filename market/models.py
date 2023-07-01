@@ -116,9 +116,8 @@ class Cart(db.Model):
             existing_cart_item.quantity = new_quantity
             existing_cart_item.total_price = new_quantity * price
 
-    def delete_item_from_cart(self, cart_item_id):
-        cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items), None)
-        self.cart_items.pop(self.cart_items.index(cart_item))
+    def update_item_quantity(self, cart_item_id):
+        existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items), None)
 
     def clear_cart(self):
         self.cart_items.clear()

@@ -48,6 +48,10 @@ class ProductDetailsAddToCartForm(FlaskForm):
     quantity = IntegerField()
     add_to_cart = SubmitField('Add to Cart')
 
-class UpdateCartItemForm(FlaskForm):
+
+class CartItemUpdateForm(FlaskForm):
     quantity = IntegerField()
-    update = SubmitField('Update cart')
+
+
+class CartItemsForm(FlaskForm):
+    cart_items = FieldList(FormField(CartItemUpdateForm))
