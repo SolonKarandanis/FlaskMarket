@@ -64,7 +64,7 @@ def market_page():
     return render_template('market.html', productList_form=productList_form, pagination=pagination)
 
 
-@app.route('/product/<int:product_id>/', methods=['GET','POST'])
+@app.route('/product/<int:product_id>/', methods=['GET', 'POST'])
 @login_required
 def product_detail_page(product_id):
     product = db.session.query(Product).options(db.joinedload(Product.types)).filter_by(id=product_id).first()
@@ -149,6 +149,20 @@ def cart():
                 flash("Error while fetching  cart")
 
         return render_template('cart.html', cart=cart)
+
+
+@app.post('/cart/<int:item_id>/delete/')
+def delete_cart_item(item_id):
+    user_id = current_user.id
+    cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+    cart.delete_item_from_cart(item_id)
+    cart.update_cart_total_price()
+    db.session.add(cart)
+    try:
+        db.session.commit()
+    except:
+        flash("Error while adding items to cart")
+    return redirect(url_for('cart'))
 
 
 @app.route('/logout')
