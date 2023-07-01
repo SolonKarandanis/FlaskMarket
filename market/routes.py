@@ -206,50 +206,5 @@ def page_not_found(error):
 def page_not_found(error):
     return render_template("500.html"), 500
 
-# @app.route('/create/', methods=('GET', 'POST'))
-# def create():
-#     if request.method == 'POST':
-#         firstname = request.form['firstname']
-#         lastname = request.form['lastname']
-#         email = request.form['email']
-#         age = int(request.form['age'])
-#         bio = request.form['bio']
-#         student = Student(firstname=firstname,
-#                           lastname=lastname,
-#                           email=email,
-#                           age=age,
-#                           bio=bio)
-#         db.session.add(student)
-#         db.session.commit()
-#
-#         return redirect(url_for('index'))
-#
-#     return render_template('create.html')
-
-# @app.route('/<int:student_id>/edit/', methods=('GET', 'POST'))
-# def edit(student_id):
-#     student = Student.query.get_or_404(student_id)
-#
-#     if request.method == 'POST':
-#         firstname = request.form['firstname']
-#         lastname = request.form['lastname']
-#         email = request.form['email']
-#         age = int(request.form['age'])
-#         bio = request.form['bio']
-#
-#         student.firstname = firstname
-#         student.lastname = lastname
-#         student.email = email
-#         student.age = age
-#         student.bio = bio
-#
-#         db.session.add(student)
-#         db.session.commit()
-#
-#         return redirect(url_for('index'))
-#
-#     return render_template('edit.html', student=student)
-
-
 # q = session.query(Item.id).filter(Item.email==email)
 # session.query(q.exists()).scalar()    # returns True or False
