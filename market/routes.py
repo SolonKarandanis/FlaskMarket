@@ -4,7 +4,7 @@ from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 from market.models import Product, User, Cart, CartItem
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
-    ProductDetailsAddToCartForm
+    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 
@@ -134,6 +134,7 @@ def login_page():
 @login_required
 def cart():
     if request.method == 'GET':
+        cart_items_form = CartItemsForm()
         user_id = current_user.id
         cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
             .filter_by(users_id=user_id).first()
@@ -148,7 +149,11 @@ def cart():
             except:
                 flash("Error while fetching  cart")
 
-        return render_template('cart.html', cart=cart)
+        for cart_item in cart.cart_items:
+            cart_item_update_form = CartItemUpdateForm()
+            cart_item_update_form.quantity = cart_item.quantity
+            cart_items_form.cart_items.append_entry(cart_item_update_form)
+        return render_template('cart.html', cart=cart, cart_items_form=cart_items_form)
 
 
 @app.post('/cart/<int:item_id>/delete/')
@@ -163,6 +168,22 @@ def delete_cart_item(item_id):
         db.session.commit()
     except:
         flash("Error while deleting item from cart")
+    return redirect(url_for('cart'))
+
+
+@app.post('/cart/<int:item_id>/update/')
+@login_required
+def update_cart_item_quantity(item_id):
+    user_id = current_user.id
+    cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+    quantity = int(request.form.get(f'cart_items-{item_id - 1}-quantity'))
+    cart.update_item_quantity(item_id, quantity)
+    cart.update_cart_total_price()
+    db.session.add(cart)
+    try:
+        db.session.commit()
+    except:
+        flash("Error while updating item in cart")
     return redirect(url_for('cart'))
 
 
@@ -229,12 +250,6 @@ def page_not_found(error):
 #
 #     return render_template('edit.html', student=student)
 
-# @app.post('/<int:student_id>/delete/')
-# def delete(student_id):
-#     student = Student.query.get_or_404(student_id)
-#     db.session.delete(student)
-#     db.session.commit()
-#     return redirect(url_for('index'))
 
 # q = session.query(Item.id).filter(Item.email==email)
 # session.query(q.exists()).scalar()    # returns True or False
