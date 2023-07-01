@@ -3,7 +3,8 @@ from datetime import datetime
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 from market.models import Product, User, Cart, CartItem
-from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm
+from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
+    ProductDetailsAddToCartForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 
@@ -63,11 +64,30 @@ def market_page():
     return render_template('market.html', productList_form=productList_form, pagination=pagination)
 
 
-@app.route('/product/<int:product_id>/', methods=['GET'])
+@app.route('/product/<int:product_id>/', methods=['GET','POST'])
 @login_required
 def product_detail_page(product_id):
     product = db.session.query(Product).options(db.joinedload(Product.types)).filter_by(id=product_id).first()
-    return render_template('product.html', product=product)
+    product_details_add_to_cart_form = ProductDetailsAddToCartForm()
+    if request.method == 'POST':
+        user_id = current_user.id
+        cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+        if cart is None:
+            cart = Cart(users_id=user_id,
+                        total_price=0,
+                        date_created=datetime.now(),
+                        cart_items=[])
+        quantity = product_details_add_to_cart_form.quantity.data
+        cart.add_item_to_cart(product.id, quantity, product.price)
+        cart.update_cart_total_price()
+        db.session.add(cart)
+        try:
+            db.session.commit()
+            return redirect(url_for('cart'))
+        except:
+            flash("Error while adding items to cart")
+    return render_template('product.html', product=product,
+                           product_details_add_to_cart_form=product_details_add_to_cart_form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
