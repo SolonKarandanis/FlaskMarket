@@ -4,7 +4,7 @@ from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 from market.models import Product, User, Cart, CartItem
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
-    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm
+    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrder
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 
@@ -134,6 +134,7 @@ def login_page():
 @login_required
 def cart():
     if request.method == 'GET':
+        place_draft_order_form = PlaceDraftOrder()
         cart_items_form = CartItemsForm()
         user_id = current_user.id
         cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
@@ -153,7 +154,8 @@ def cart():
             cart_item_update_form = CartItemUpdateForm()
             cart_item_update_form.quantity = cart_item.quantity
             cart_items_form.cart_items.append_entry(cart_item_update_form)
-        return render_template('cart.html', cart=cart, cart_items_form=cart_items_form)
+        return render_template('cart.html', cart=cart, cart_items_form=cart_items_form,
+                               place_draft_order_form=place_draft_order_form)
 
 
 @app.post('/cart/<int:item_id>/delete/')
