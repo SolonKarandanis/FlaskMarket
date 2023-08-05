@@ -116,27 +116,27 @@
               <span class="badge badge-success mr-2">Note</span>
               <span class="text-dark">Additional comments</span>
             </h3>
-            <textarea
-              class="form-control mb-3"
-              id="order-comments"
-              rows="5"></textarea>
-            <a class="btn btn-primary btn-block" href="#">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewbox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="feather feather-credit-card mr-2">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <line x1="1" y1="10" x2="23" y2="10"></line>
-              </svg>
-              Place Order
-            </a>
+            <form action="{{ url_for('cart') }}" method="post" name="place_order">
+              {{ place_draft_order_form.csrf_token}}
+              {{place_draft_order_form.comments(class="form-control mb-3",rows="5")}}
+              <button class="btn btn-primary btn-block" >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewbox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="feather feather-credit-card mr-2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                Place Order
+              </button>
+            </form>
           </div>
         </div>
       </div>

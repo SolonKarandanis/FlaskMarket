@@ -57,5 +57,5 @@ class CartItemsForm(FlaskForm):
     cart_items = FieldList(FormField(CartItemUpdateForm))
 
 
-class PlaceDraftOrder(FlaskForm):
-    comments = StringField()
+class PlaceDraftOrderForm(FlaskForm):
+    comments = TextAreaField()

@@ -4,7 +4,7 @@ from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 from market.models import Product, User, Cart, CartItem
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
-    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrder
+    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 
@@ -133,12 +133,12 @@ def login_page():
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
 def cart():
+    place_draft_order_form = PlaceDraftOrderForm()
+    user_id = current_user.id
+    cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
+        .filter_by(users_id=user_id).first()
     if request.method == 'GET':
-        place_draft_order_form = PlaceDraftOrder()
         cart_items_form = CartItemsForm()
-        user_id = current_user.id
-        cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
-            .filter_by(users_id=user_id).first()
         if cart is None:
             cart = Cart(users_id=user_id,
                         total_price=0,
@@ -194,6 +194,7 @@ def update_cart_item_quantity(item_id):
 def place_draft_order():
     user_id = current_user.id
     cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+
 
 
 @app.route('/logout')
