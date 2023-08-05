@@ -154,6 +154,7 @@ class Order(db.Model):
     date_created = db.Column(db.Date())
     status = db.Column(db.String(length=40))
     total_price = db.Column(db.Float)
+    comments = db.Column(db.String(length=2048))
 
     def __repr__(self):
         return f"<Order {self.id}>"

@@ -187,6 +187,13 @@ def update_cart_item_quantity(item_id):
     return redirect(url_for('cart'))
 
 
+@app.post('/order')
+@login_required
+def place_draft_order():
+    user_id = current_user.id
+    cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+
+
 @app.route('/logout')
 def logout_page():
     logout_user()
