@@ -155,6 +155,8 @@ class Order(db.Model):
     status = db.Column(db.String(length=40))
     total_price = db.Column(db.Float)
     comments = db.Column(db.String(length=2048))
+    order_items = db.relationship('OrderItem', backref="order")
+    users_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
     def __repr__(self):
         return f"<Order {self.id}>"

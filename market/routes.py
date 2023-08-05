@@ -2,7 +2,7 @@ from datetime import datetime
 
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
-from market.models import Product, User, Cart, CartItem
+from market.models import Product, User, Cart, CartItem,Order
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
     ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
 from flask_login import login_user, logout_user, login_required, current_user
@@ -157,6 +157,9 @@ def cart():
         return render_template('cart.html', cart=cart, cart_items_form=cart_items_form,
                                place_draft_order_form=place_draft_order_form)
 
+    if place_draft_order_form.validate_on_submit():
+        order_comments = place_draft_order_form.comments.data
+
 
 @app.post('/cart/<int:item_id>/delete/')
 @login_required
@@ -189,11 +192,11 @@ def update_cart_item_quantity(item_id):
     return redirect(url_for('cart'))
 
 
-@app.post('/order')
+@app.route('/order', methods=['GET', 'POST'])
 @login_required
 def place_draft_order():
     user_id = current_user.id
-    cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+    order = Order.query.options(db.joinedload(Order.order_items)).filter_by(users_id=user_id).first()
 
 
 
