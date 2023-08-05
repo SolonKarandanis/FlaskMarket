@@ -70,7 +70,7 @@ class Product(ProductTypeBase):
 
     id = db.Column(db.Integer, primary_key=True)
     sku = db.Column(db.String(length=255), nullable=False)
-    name = db.Column(db.String(length=30), nullable=False)
+    name = db.Column(db.String(length=255), nullable=False)
     supplier = db.Column(db.String(length=30), nullable=False)
     description = db.Column(db.Text(), nullable=False)
     price = db.Column(db.Float)
@@ -157,3 +157,17 @@ class Order(db.Model):
 
     def __repr__(self):
         return f"<Order {self.id}>"
+
+
+class OrderItem(db.Model):
+    __tablename__ = 'order_items'
+    id = db.Column(db.Integer, primary_key=True)
+    products_id = db.Column(db.Integer, db.ForeignKey(Product.id))
+    orders_id = db.Column(db.Integer, db.ForeignKey(Order.id))
+    product_name = db.Column(db.String(length=255), nullable=False)
+    start_date = db.Column(db.Date())
+    end_date = db.Column(db.Date())
+    status = db.Column(db.String(length=40))
+    price = db.Column(db.Float)
+    quantity = db.Column(db.Integer)
+    total_price = db.Column(db.Float)
