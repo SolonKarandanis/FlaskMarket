@@ -234,3 +234,7 @@ def page_not_found(error):
 
 # q = session.query(Item.id).filter(Item.email==email)
 # session.query(q.exists()).scalar()    # returns True or False
+
+#@app.route('/api/data')
+#def data():
+#    return {'data': [user.to_dict() for user in User.query]}

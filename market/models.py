@@ -158,7 +158,7 @@ class Cart(db.Model):
             'total_price': self.total_price,
             'date_created': self.date_created,
             'date_modified': self.date_modified,
-            'cart_items': self.cart_items,
+            'cart_items': [cart_item.to_dict() for cart_item in self.cart_items],
             'users_id': self.users_id,
         }
 
@@ -211,7 +211,7 @@ class Order(db.Model):
             'status': self.status,
             'comments': self.comments,
             'users_id': self.users_id,
-            'order_items': self.order_items,
+            'order_items': [order_item.to_dict() for order_item in self.order_items]
         }
 
     def add_order_items(self, cart_items):
@@ -245,3 +245,19 @@ class OrderItem(db.Model):
 
     def __repr__(self):
         return f"<OrderItem {self.id}>"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'product_id': self.product_id,
+            'orders_id': self.orders_id,
+            'product_name': self.product_name,
+            'sku': self.sku,
+            'manufacturer': self.manufacturer,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'status': self.status,
+            'price': self.price,
+            'quantity': self.quantity,
+            'total_price': self.total_price,
+        }
