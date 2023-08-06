@@ -159,7 +159,18 @@ def cart():
 
     if place_draft_order_form.validate_on_submit():
         order_comments = place_draft_order_form.comments.data
-        return redirect(url_for('order_page'))
+        order = Order(users_id=user_id,
+                      date_created=datetime.now(),
+                      status="order.submitted",
+                      total_price=cart.total_price,
+                      comments=order_comments)
+        order.add_order_items(cart.cart_items)
+        db.session.add(order)
+        try:
+            db.session.commit()
+        except:
+            flash("Error while creating  order")
+        return redirect(url_for('order_detail_page', order_id=order.id))
 
 
 @app.post('/cart/<int:item_id>/delete/')
@@ -193,11 +204,13 @@ def update_cart_item_quantity(item_id):
     return redirect(url_for('cart'))
 
 
-@app.route('/order', methods=['GET', 'POST'])
+@app.route('/order/<int:order_id>', methods=['GET', 'POST'])
 @login_required
-def order_page():
+def order_detail_page(order_id):
     user_id = current_user.id
-    order = Order.query.options(db.joinedload(Order.order_items)).filter_by(users_id=user_id).first()
+    order = Order.query.options(db.joinedload(Order.order_items))\
+        .filter_by(users_id=user_id).filter_by(id=order_id).first()
+    return render_template('order_details.html', order=order)
 
 
 @app.route('/logout')

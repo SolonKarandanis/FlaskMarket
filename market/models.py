@@ -1,5 +1,5 @@
 from typing import Set
-
+from datetime import datetime
 from market import db, login_manager
 from market import bcrypt
 from flask_login import UserMixin
@@ -76,7 +76,6 @@ class Product(ProductTypeBase):
     price = db.Column(db.Float)
     types: db.Mapped[Set[Type]] = db.relationship(secondary=product_type)
 
-
     @property
     def inline_types(self):
         types_list = list(self.types)
@@ -150,7 +149,7 @@ class CartItem(db.Model):
 class Order(db.Model):
     __tablename__ = 'orders'
 
-    id = db.Column(db.Integer,  db.Sequence("orders_sq", start=1), primary_key=True)
+    id = db.Column(db.Integer, db.Sequence("orders_sq", start=1), primary_key=True)
     date_created = db.Column(db.Date())
     status = db.Column(db.String(length=40))
     total_price = db.Column(db.Float)
@@ -161,16 +160,34 @@ class Order(db.Model):
     def __repr__(self):
         return f"<Order {self.id}>"
 
+    def add_order_items(self, cart_items):
+        for cart_item in cart_items:
+            order_item = OrderItem(product_id=cart_item.products_id,
+                                   product_name=cart_item.product.name,
+                                   sku=cart_item.product.sku,
+                                   manufacturer=cart_item.product.supplier,
+                                   start_date=datetime.now(),
+                                   status=self.status,
+                                   price=cart_item.unit_price,
+                                   quantity=cart_item.quantity,
+                                   total_price=cart_item.total_price)
+            self.order_items.append(order_item)
+
 
 class OrderItem(db.Model):
     __tablename__ = 'order_items'
-    id = db.Column(db.Integer,  db.Sequence("order_items_sq", start=1), primary_key=True)
-    products_id = db.Column(db.Integer, db.ForeignKey(Product.id))
+    id = db.Column(db.Integer, db.Sequence("order_items_sq", start=1), primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey(Product.id))
     orders_id = db.Column(db.Integer, db.ForeignKey(Order.id))
     product_name = db.Column(db.String(length=255), nullable=False)
+    sku = db.Column(db.String(length=255), nullable=False)
+    manufacturer = db.Column(db.String(length=255), nullable=False)
     start_date = db.Column(db.Date())
     end_date = db.Column(db.Date())
     status = db.Column(db.String(length=40))
     price = db.Column(db.Float)
     quantity = db.Column(db.Integer)
     total_price = db.Column(db.Float)
+
+    def __repr__(self):
+        return f"<OrderItem {self.id}>"
