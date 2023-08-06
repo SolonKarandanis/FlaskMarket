@@ -24,6 +24,13 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"<User {self.username}>"
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'address': self.email_address,
+        }
+
     @property
     def prettier_budget(self):
         if len(str(self.budget)) >= 4:
@@ -64,6 +71,12 @@ class Type(ProductTypeBase):
     def __repr__(self):
         return f"<Type {self.name}>"
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'type': self.type_name,
+        }
+
 
 class Product(ProductTypeBase):
     __tablename__ = 'product'
@@ -88,6 +101,16 @@ class Product(ProductTypeBase):
 
     def __repr__(self):
         return f"<Product {self.name}>"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'sku': self.sku,
+            'name': self.name,
+            'supplier': self.supplier,
+            'description': self.description,
+            'price': self.price,
+        }
 
 
 class Cart(db.Model):
@@ -129,6 +152,16 @@ class Cart(db.Model):
     def __repr__(self):
         return f"<Cart {self.id}>"
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'total_price': self.total_price,
+            'date_created': self.date_created,
+            'date_modified': self.date_modified,
+            'cart_items': self.cart_items,
+            'users_id': self.users_id,
+        }
+
 
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
@@ -145,6 +178,16 @@ class CartItem(db.Model):
     def __repr__(self):
         return f"<CartItem {self.id}>"
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'quantity': self.quantity,
+            'unit_price': self.unit_price,
+            'total_price': self.total_price,
+            'carts_id': self.carts_id,
+            'products_id': self.products_id,
+        }
+
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -159,6 +202,17 @@ class Order(db.Model):
 
     def __repr__(self):
         return f"<Order {self.id}>"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'total_price': self.total_price,
+            'date_created': self.date_created,
+            'status': self.status,
+            'comments': self.comments,
+            'users_id': self.users_id,
+            'order_items': self.order_items,
+        }
 
     def add_order_items(self, cart_items):
         for cart_item in cart_items:
