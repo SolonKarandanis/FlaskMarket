@@ -238,3 +238,22 @@ def page_not_found(error):
 #@app.route('/api/data')
 #def data():
 #    return {'data': [user.to_dict() for user in User.query]}
+
+#@app.route('/api/data')
+#def data():
+#    query = User.query
+
+#    total_filtered = query.count()
+
+    # pagination
+#    start = request.args.get('start', type=int)
+#    length = request.args.get('length', type=int)
+#    query = query.offset(start).limit(length)
+
+    # response
+#    return {
+#        'data': [user.to_dict() for user in query],
+#        'recordsFiltered': total_filtered,
+#        'recordsTotal': User.query.count(),
+#        'draw': request.args.get('draw', type=int),
+#    }
