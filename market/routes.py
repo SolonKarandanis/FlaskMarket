@@ -30,7 +30,7 @@ def market_page():
 
     if request.method == 'POST':
         user_id = current_user.id
-        cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+        cart = cart_repo.find_with_items_by_user_id(user_id)
         if cart is None:
             cart = Cart(users_id=user_id,
                         total_price=0,
@@ -73,7 +73,7 @@ def product_detail_page(product_id):
     product_details_add_to_cart_form = ProductDetailsAddToCartForm()
     if request.method == 'POST':
         user_id = current_user.id
-        cart = cart_repo.find_by_user_id(user_id)
+        cart = cart_repo.find_with_items_by_user_id(user_id)
         if cart is None:
             cart = Cart(users_id=user_id,
                         total_price=0,
@@ -81,7 +81,6 @@ def product_detail_page(product_id):
                         cart_items=[])
         quantity = product_details_add_to_cart_form.quantity.data
         cart.add_item_to_cart(product.id, quantity, product.price)
-        cart.update_cart_total_price()
         db.session.add(cart)
         try:
             db.session.commit()
@@ -137,16 +136,11 @@ def login_page():
 def cart():
     place_draft_order_form = PlaceDraftOrderForm()
     user_id = current_user.id
-    cart = Cart.query.options(db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
-        .filter_by(users_id=user_id).first()
+    cart = cart_repo.find_with_items_and_products_by_user_id(user_id)
     if request.method == 'GET':
         cart_items_form = CartItemsForm()
         if cart is None:
-            cart = Cart(users_id=user_id,
-                        total_price=0,
-                        date_created=datetime.now(),
-                        date_modified=datetime.now())
-            db.session.add(cart)
+            cart = cart_repo.add(user_id)
             try:
                 db.session.commit()
             except:
@@ -170,7 +164,6 @@ def cart():
         order.add_order_items(cart_items)
         db.session.add(order)
         cart.clear_cart()
-        cart.update_cart_total_price()
         db.session.add(cart)
         try:
             db.session.commit()
@@ -184,10 +177,10 @@ def cart():
 @login_required
 def delete_cart_item(item_id):
     user_id = current_user.id
-    cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+    cart = cart_repo.find_with_items_by_user_id(user_id)
     cart_item = next(filter(lambda ci: ci.id == item_id, cart.cart_items), None)
-    db.session.delete(cart_item)
-    cart.update_cart_total_price()
+    cart.remove_from_cart(cart_item)
+    db.session.add(cart)
     try:
         db.session.commit()
     except:
@@ -199,10 +192,11 @@ def delete_cart_item(item_id):
 @login_required
 def update_cart_item_quantity(item_id):
     user_id = current_user.id
-    cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+    cart = cart_repo.find_with_items_by_user_id(user_id)
+    s= request.form.get(f'cart_items-{item_id - 1}-quantity')
+    logger.info(f's: {request.form}')
     quantity = int(request.form.get(f'cart_items-{item_id - 1}-quantity'))
     cart.update_item_quantity(item_id, quantity)
-    cart.update_cart_total_price()
     db.session.add(cart)
     try:
         db.session.commit()

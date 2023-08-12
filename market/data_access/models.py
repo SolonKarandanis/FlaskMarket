@@ -138,13 +138,21 @@ class Cart(db.Model):
             existing_cart_item.quantity = new_quantity
             existing_cart_item.total_price = new_quantity * price
 
+        self.update_cart_total_price()
+
     def update_item_quantity(self, cart_item_id, quantity):
         existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items), None)
         existing_cart_item.quantity = quantity
         existing_cart_item.total_price = quantity * existing_cart_item.unit_price
+        self.update_cart_total_price()
+
+    def remove_from_cart(self, cart_item):
+        self.cart_items.remove(cart_item)
+        self.update_cart_total_price()
 
     def clear_cart(self):
         self.cart_items.clear()
+        self.update_cart_total_price()
 
     def update_cart_total_price(self):
         self.total_price = sum(ci.total_price for ci in self.cart_items)
