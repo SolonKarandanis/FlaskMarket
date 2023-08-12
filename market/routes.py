@@ -3,7 +3,7 @@ from datetime import datetime
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 
-from market.data_access import product_repo, cart_repo
+from market.data_access import product_repo, cart_repo, user_repo
 from market.data_access.models import  User, Cart, CartItem, Order
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
     ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
@@ -95,10 +95,7 @@ def product_detail_page(product_id):
 def register_page():
     form = RegisterForm()
     if form.validate_on_submit():
-        user_to_create = User(username=form.username.data,
-                              email_address=form.email_address.data,
-                              password=form.password1.data)
-        db.session.add(user_to_create)
+        user_to_create = user_repo.add(form.username.data, form.email_address.data, form.password1.data)
         db.session.commit()
         return redirect(url_for('market_page'))
     if form.errors != {}:  # If there are not errors from the validations
@@ -118,7 +115,7 @@ def login_page():
         attempted_username = form.username.data
         attempted_password = form.password.data
 
-        attempted_user = User.query.filter_by(username=attempted_username).first()
+        attempted_user = user_repo.find_by_username(attempted_username)
         if attempted_user and attempted_user.check_password_correction(
                 attempted_password
         ):
