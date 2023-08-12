@@ -2,7 +2,7 @@ from datetime import datetime
 
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
-from market.models import Product, User, Cart, CartItem, Order
+from market.data_access.models import Product, User, Cart, CartItem, Order
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
     ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
 from flask_login import login_user, logout_user, login_required, current_user
