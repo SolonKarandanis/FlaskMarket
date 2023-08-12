@@ -2,7 +2,9 @@ from datetime import datetime
 
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
-from market.data_access.models import Product, User, Cart, CartItem, Order
+
+from market.data_access import product_repo, cart_repo
+from market.data_access.models import  User, Cart, CartItem, Order
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
     ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
 from flask_login import login_user, logout_user, login_required, current_user
@@ -22,7 +24,7 @@ def home_page():
 @login_required
 def market_page():
     page = request.args.get('page', 1, type=int)
-    pagination = db.session.query(Product).order_by(Product.id).paginate(page=page, per_page=5)
+    pagination = product_repo.find_all(page)
     logger.info('Loaded products')
     productList_form = ProductListAddToCartForm()
 
@@ -67,11 +69,11 @@ def market_page():
 @app.route('/product/<int:product_id>/', methods=['GET', 'POST'])
 @login_required
 def product_detail_page(product_id):
-    product = db.session.query(Product).options(db.joinedload(Product.types)).filter_by(id=product_id).first()
+    product = product_repo.find_by_id(product_id)
     product_details_add_to_cart_form = ProductDetailsAddToCartForm()
     if request.method == 'POST':
         user_id = current_user.id
-        cart = Cart.query.options(db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
+        cart = cart_repo.find_by_user_id(user_id)
         if cart is None:
             cart = Cart(users_id=user_id,
                         total_price=0,
