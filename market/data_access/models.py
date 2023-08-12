@@ -1,4 +1,4 @@
-from typing import Set
+from typing import Set, List
 from datetime import datetime
 from market import db, login_manager
 from market import bcrypt
@@ -222,7 +222,7 @@ class Order(db.Model):
             'order_items': [order_item.to_dict() for order_item in self.order_items]
         }
 
-    def add_order_items(self, cart_items):
+    def add_order_items(self, cart_items: List[CartItem]):
         for cart_item in cart_items:
             order_item = OrderItem(product_id=cart_item.products_id,
                                    product_name=cart_item.product.name,

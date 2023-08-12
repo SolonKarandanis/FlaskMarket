@@ -5,7 +5,7 @@ class ProductRepository:
     def __init__(self, db):
         self.db = db
 
-    def find_by_id(self, product_id: int):
+    def find_by_id(self, product_id: int) -> Product:
         return self.db.session.query(Product)\
             .options(self.db.joinedload(Product.types)).filter_by(id=product_id).first()
 

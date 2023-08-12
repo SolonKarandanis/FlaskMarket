@@ -7,15 +7,15 @@ class CartRepository:
     def __init__(self, db):
         self.db = db
 
-    def find_with_items_by_user_id(self, user_id: int):
+    def find_with_items_by_user_id(self, user_id: int) -> Cart:
         return Cart.query \
             .options(self.db.joinedload(Cart.cart_items)).filter_by(users_id=user_id).first()
 
-    def find_with_items_and_products_by_user_id(self, user_id: int):
+    def find_with_items_and_products_by_user_id(self, user_id: int) -> Cart:
         return Cart.query.options(self.db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
             .filter_by(users_id=user_id).first()
 
-    def add(self, user_id: int, cart_items=[]):
+    def add(self, user_id: int, cart_items=[]) -> Cart:
         cart = Cart(users_id=user_id,
                     total_price=0,
                     date_created=datetime.now(),

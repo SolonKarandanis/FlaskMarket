@@ -7,11 +7,11 @@ class OrderRepository:
     def __init__(self, db):
         self.db = db
 
-    def find_by_user_and_id(self, user_id: int, order_id: int):
+    def find_by_user_and_id(self, user_id: int, order_id: int) -> Order:
         return Order.query.options(self.db.joinedload(Order.order_items)) \
             .filter_by(users_id=user_id).filter_by(id=order_id).first()
 
-    def add(self, user_id: int, total_price: float, order_comments: str):
+    def add(self, user_id: int, total_price: float, order_comments: str) -> Order:
         order = Order(users_id=user_id,
                       date_created=datetime.now(),
                       status="order.submitted",
