@@ -6,7 +6,7 @@ from flask_login import UserMixin
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: int):
     return User.query.get(int(user_id))
 
 
@@ -43,10 +43,10 @@ class User(db.Model, UserMixin):
         return self.password
 
     @password.setter
-    def password(self, plain_text_password):
+    def password(self, plain_text_password: str):
         self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
 
-    def check_password_correction(self, attempted_password):
+    def check_password_correction(self, attempted_password: str):
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
 
 
@@ -124,7 +124,7 @@ class Cart(db.Model):
     cart_items = db.relationship('CartItem', backref="cart", cascade="all, delete-orphan")
     users_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
-    def add_item_to_cart(self, products_id, quantity, price):
+    def add_item_to_cart(self, products_id: int, quantity: int, price: float):
         existing_cart_item = next(filter(lambda ci: ci.products_id == products_id, self.cart_items), None)
         if existing_cart_item is None:
             cart_item = CartItem(quantity=quantity,
@@ -140,7 +140,7 @@ class Cart(db.Model):
 
         self.update_cart_total_price()
 
-    def update_item_quantity(self, cart_item_id, quantity):
+    def update_item_quantity(self, cart_item_id: int, quantity: int):
         existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items), None)
         existing_cart_item.quantity = quantity
         existing_cart_item.total_price = quantity * existing_cart_item.unit_price
