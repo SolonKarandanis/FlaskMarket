@@ -164,10 +164,15 @@ def cart():
                       status="order.submitted",
                       total_price=cart.total_price,
                       comments=order_comments)
-        order.add_order_items(cart.cart_items)
+        cart_items = cart.cart_items
+        order.add_order_items(cart_items)
         db.session.add(order)
+        cart.clear_cart()
+        cart.update_cart_total_price()
+        db.session.add(cart)
         try:
             db.session.commit()
+
         except:
             flash("Error while creating  order")
         return redirect(url_for('order_detail_page', order_id=order.id))

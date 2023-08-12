@@ -121,7 +121,7 @@ class Cart(db.Model):
     modification_alert = db.Column(db.Boolean())
     date_created = db.Column(db.DateTime(timezone=True))
     date_modified = db.Column(db.DateTime(timezone=True))
-    cart_items = db.relationship('CartItem', backref="cart")
+    cart_items = db.relationship('CartItem', backref="cart", cascade="all, delete-orphan")
     users_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
     def add_item_to_cart(self, products_id, quantity, price):
