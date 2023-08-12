@@ -46,7 +46,7 @@ class User(db.Model, UserMixin):
     def password(self, plain_text_password: str):
         self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
 
-    def check_password_correction(self, attempted_password: str):
+    def check_password_correction(self, attempted_password: str) -> bool:
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
 
 
@@ -124,7 +124,7 @@ class Cart(db.Model):
     cart_items = db.relationship('CartItem', backref="cart", cascade="all, delete-orphan")
     users_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
-    def add_item_to_cart(self, products_id: int, quantity: int, price: float):
+    def add_item_to_cart(self, products_id: int, quantity: int, price: float) -> None:
         existing_cart_item = next(filter(lambda ci: ci.products_id == products_id, self.cart_items), None)
         if existing_cart_item is None:
             cart_item = CartItem(quantity=quantity,
@@ -140,21 +140,21 @@ class Cart(db.Model):
 
         self.update_cart_total_price()
 
-    def update_item_quantity(self, cart_item_id: int, quantity: int):
+    def update_item_quantity(self, cart_item_id: int, quantity: int) -> None:
         existing_cart_item = next(filter(lambda ci: ci.id == cart_item_id, self.cart_items), None)
         existing_cart_item.quantity = quantity
         existing_cart_item.total_price = quantity * existing_cart_item.unit_price
         self.update_cart_total_price()
 
-    def remove_from_cart(self, cart_item):
+    def remove_from_cart(self, cart_item) -> None:
         self.cart_items.remove(cart_item)
         self.update_cart_total_price()
 
-    def clear_cart(self):
+    def clear_cart(self) -> None:
         self.cart_items.clear()
         self.update_cart_total_price()
 
-    def update_cart_total_price(self):
+    def update_cart_total_price(self) -> None:
         self.total_price = sum(ci.total_price for ci in self.cart_items)
 
     def __repr__(self):
@@ -222,7 +222,7 @@ class Order(db.Model):
             'order_items': [order_item.to_dict() for order_item in self.order_items]
         }
 
-    def add_order_items(self, cart_items: List[CartItem]):
+    def add_order_items(self, cart_items: List[CartItem]) -> None:
         for cart_item in cart_items:
             order_item = OrderItem(product_id=cart_item.products_id,
                                    product_name=cart_item.product.name,
