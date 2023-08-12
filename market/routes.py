@@ -3,8 +3,8 @@ from datetime import datetime
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 
-from market.data_access import product_repo, cart_repo, user_repo
-from market.data_access.models import  User, Cart, CartItem, Order
+from market.data_access import product_repo, cart_repo, user_repo, order_repo
+from market.data_access.models import Cart, Order
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
     ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
 from flask_login import login_user, logout_user, login_required, current_user
@@ -190,7 +190,7 @@ def delete_cart_item(item_id):
 def update_cart_item_quantity(item_id):
     user_id = current_user.id
     cart = cart_repo.find_with_items_by_user_id(user_id)
-    s= request.form.get(f'cart_items-{item_id - 1}-quantity')
+    s = request.form.get(f'cart_items-{item_id - 1}-quantity')
     logger.info(f's: {request.form}')
     quantity = int(request.form.get(f'cart_items-{item_id - 1}-quantity'))
     cart.update_item_quantity(item_id, quantity)
@@ -206,8 +206,7 @@ def update_cart_item_quantity(item_id):
 @login_required
 def order_detail_page(order_id):
     user_id = current_user.id
-    order = Order.query.options(db.joinedload(Order.order_items))\
-        .filter_by(users_id=user_id).filter_by(id=order_id).first()
+    order = order_repo.find_by_user_and_id(user_id, order_id)
     return render_template('order_details.html', order=order)
 
 
@@ -233,22 +232,22 @@ def page_not_found(error):
 # q = session.query(Item.id).filter(Item.email==email)
 # session.query(q.exists()).scalar()    # returns True or False
 
-#@app.route('/api/data')
-#def data():
+# @app.route('/api/data')
+# def data():
 #    return {'data': [user.to_dict() for user in User.query]}
 
-#@app.route('/api/data')
-#def data():
+# @app.route('/api/data')
+# def data():
 #    query = User.query
 
 #    total_filtered = query.count()
 
-    # pagination
+# pagination
 #    start = request.args.get('start', type=int)
 #    length = request.args.get('length', type=int)
 #    query = query.offset(start).limit(length)
 
-    # response
+# response
 #    return {
 #        'data': [user.to_dict() for user in query],
 #        'recordsFiltered': total_filtered,
