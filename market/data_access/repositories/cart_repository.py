@@ -15,7 +15,7 @@ class CartRepository:
         return Cart.query.options(self.db.joinedload(Cart.cart_items).joinedload(CartItem.product)) \
             .filter_by(users_id=user_id).first()
 
-    def add(self, user_id: int, cart_items=[]) -> Cart:
+    def create(self, user_id: int, cart_items=[]) -> Cart:
         cart = Cart(users_id=user_id,
                     total_price=0,
                     date_created=datetime.now(),

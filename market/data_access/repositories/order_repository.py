@@ -11,7 +11,7 @@ class OrderRepository:
         return Order.query.options(self.db.joinedload(Order.order_items)) \
             .filter_by(users_id=user_id).filter_by(id=order_id).first()
 
-    def add(self, user_id: int, total_price: float, order_comments: str) -> Order:
+    def create(self, user_id: int, total_price: float, order_comments: str) -> Order:
         order = Order(users_id=user_id,
                       date_created=datetime.now(),
                       status="order.submitted",

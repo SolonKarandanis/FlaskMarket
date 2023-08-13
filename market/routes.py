@@ -30,7 +30,7 @@ def market_page():
         user_id = current_user.id
         cart = cart_repo.find_with_items_by_user_id(user_id)
         if cart is None:
-            cart = cart_repo.add(user_id)
+            cart = cart_repo.create(user_id)
 
         for product, product_form in zip(pagination.items, productList_form.products):
             is_selected = product_form.selected.data
@@ -70,7 +70,7 @@ def product_detail_page(product_id):
         user_id = current_user.id
         cart = cart_repo.find_with_items_by_user_id(user_id)
         if cart is None:
-            cart = cart_repo.add(user_id)
+            cart = cart_repo.create(user_id)
         quantity = product_details_add_to_cart_form.quantity.data
         cart.add_item_to_cart(product.id, quantity, product.price)
         db.session.add(cart)
@@ -87,7 +87,7 @@ def product_detail_page(product_id):
 def register_page():
     form = RegisterForm()
     if form.validate_on_submit():
-        user_to_create = user_repo.add(form.username.data, form.email_address.data, form.password1.data)
+        user_to_create = user_repo.create(form.username.data, form.email_address.data, form.password1.data)
         db.session.commit()
         return redirect(url_for('market_page'))
     if form.errors != {}:  # If there are not errors from the validations
@@ -136,7 +136,7 @@ def cart():
     if request.method == 'GET':
         cart_items_form = CartItemsForm()
         if cart is None:
-            cart = cart_repo.add(user_id)
+            cart = cart_repo.create(user_id)
             try:
                 db.session.commit()
             except:
@@ -151,7 +151,7 @@ def cart():
 
     if place_draft_order_form.validate_on_submit():
         order_comments = place_draft_order_form.comments.data
-        order = order_repo.add(user_id, cart.total_price, order_comments)
+        order = order_repo.create(user_id, cart.total_price, order_comments)
         cart_items = cart.cart_items
         order.add_order_items(cart_items)
         db.session.add(order)
