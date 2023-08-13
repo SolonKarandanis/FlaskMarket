@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from market.data_access.models import Order
+from market.data_access.models.models import Order
 
 
 class OrderRepository:

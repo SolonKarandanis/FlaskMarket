@@ -18,7 +18,6 @@ def home_page():
     return render_template('home.html')
 
 
-
 @app.route('/market', methods=['GET', 'POST'])
 @login_required
 def market_page():
@@ -127,6 +126,7 @@ def profile_page():
     user = current_user
     return render_template('profile.html', user=user)
 
+
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
 def cart():
@@ -151,7 +151,7 @@ def cart():
 
     if place_draft_order_form.validate_on_submit():
         order_comments = place_draft_order_form.comments.data
-        order = order_repo.add(user_id,cart.total_price,order_comments)
+        order = order_repo.add(user_id, cart.total_price, order_comments)
         cart_items = cart.cart_items
         order.add_order_items(cart_items)
         db.session.add(order)

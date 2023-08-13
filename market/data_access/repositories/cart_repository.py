@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from market.data_access.models import Cart, CartItem
+from market.data_access.models.models import Cart, CartItem
 
 
 class CartRepository:

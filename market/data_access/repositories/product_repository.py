@@ -1,4 +1,4 @@
-from market.data_access.models import Product
+from market.data_access.models.models import Product
 
 
 class ProductRepository:

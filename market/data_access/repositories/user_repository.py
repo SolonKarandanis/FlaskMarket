@@ -1,4 +1,4 @@
-from market.data_access.models import User
+from market.data_access.models.models import User
 
 
 class UserRepository:
