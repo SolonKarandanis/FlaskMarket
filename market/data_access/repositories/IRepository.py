@@ -14,7 +14,7 @@ class IRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create(self, item):
+    def create(self, *args):
         raise NotImplementedError
 
     @abstractmethod

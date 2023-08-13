@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from market.data_access.models.models import Order
+from market.data_access.repositories.IRepository import IRepository
 
 
-class OrderRepository:
+class OrderRepository(IRepository):
     def __init__(self, db):
         self.db = db
 
@@ -19,3 +20,18 @@ class OrderRepository:
                       comments=order_comments)
         self.db.session.add(order)
         return order
+
+    def find_all(self):
+        pass
+
+    def find_all_pageable(self, page, rows_per_page: int = 5):
+        pass
+
+    def find_by_id(self, item_id: int):
+        pass
+
+    def update(self, item):
+        pass
+
+    def delete(self, item_id: int):
+        pass

@@ -1,7 +1,8 @@
 from market.data_access.models.models import User
+from market.data_access.repositories.IRepository import IRepository
 
 
-class UserRepository:
+class UserRepository(IRepository):
     def __init__(self, db):
         self.db = db
 
@@ -14,3 +15,18 @@ class UserRepository:
                               password=password)
         self.db.session.add(user_to_create)
         return user_to_create
+
+    def find_all(self):
+        pass
+
+    def find_all_pageable(self, page, rows_per_page: int = 5):
+        pass
+
+    def find_by_id(self, item_id: int):
+        pass
+
+    def update(self, item):
+        pass
+
+    def delete(self, item_id: int):
+        pass

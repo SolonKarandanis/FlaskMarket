@@ -22,5 +22,5 @@ class ProductRepository(IRepository):
     def update(self, item):
         pass
 
-    def delete(self, id):
+    def delete(self, item_id):
         pass
