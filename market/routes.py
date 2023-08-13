@@ -18,7 +18,7 @@ def home_page():
     return render_template('home.html')
 
 
-# user = session.query(User).filter_by(name=name).first()
+
 @app.route('/market', methods=['GET', 'POST'])
 @login_required
 def market_page():
@@ -120,6 +120,12 @@ def login_page():
             flash('Username and password are not match! Please try again', category='danger')
     return render_template('login.html', form=form)
 
+
+@app.route('/user')
+@login_required
+def profile_page():
+    user = current_user
+    return render_template('profile.html', user=user)
 
 @app.route('/cart', methods=['GET', 'POST'])
 @login_required
