@@ -4,7 +4,6 @@ from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 
 from market.data_access import product_repo, cart_repo, user_repo, order_repo
-from market.data_access.models import Cart, Order
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
     ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
 from flask_login import login_user, logout_user, login_required, current_user
@@ -32,10 +31,7 @@ def market_page():
         user_id = current_user.id
         cart = cart_repo.find_with_items_by_user_id(user_id)
         if cart is None:
-            cart = Cart(users_id=user_id,
-                        total_price=0,
-                        date_created=datetime.now(),
-                        cart_items=[])
+            cart = cart_repo.add(user_id)
 
         for product, product_form in zip(pagination.items, productList_form.products):
             is_selected = product_form.selected.data
@@ -75,10 +71,7 @@ def product_detail_page(product_id):
         user_id = current_user.id
         cart = cart_repo.find_with_items_by_user_id(user_id)
         if cart is None:
-            cart = Cart(users_id=user_id,
-                        total_price=0,
-                        date_created=datetime.now(),
-                        cart_items=[])
+            cart = cart_repo.add(user_id)
         quantity = product_details_add_to_cart_form.quantity.data
         cart.add_item_to_cart(product.id, quantity, product.price)
         db.session.add(cart)
@@ -152,11 +145,7 @@ def cart():
 
     if place_draft_order_form.validate_on_submit():
         order_comments = place_draft_order_form.comments.data
-        order = Order(users_id=user_id,
-                      date_created=datetime.now(),
-                      status="order.submitted",
-                      total_price=cart.total_price,
-                      comments=order_comments)
+        order = order_repo.add(user_id,cart.total_price,order_comments)
         cart_items = cart.cart_items
         order.add_order_items(cart_items)
         db.session.add(order)
