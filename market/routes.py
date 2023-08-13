@@ -22,7 +22,7 @@ def home_page():
 @login_required
 def market_page():
     page = request.args.get('page', 1, type=int)
-    pagination = product_repo.find_all(page)
+    pagination = product_repo.find_all_pageable(page)
     logger.info('Loaded products')
     productList_form = ProductListAddToCartForm()
 
