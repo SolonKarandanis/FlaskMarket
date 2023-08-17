@@ -211,19 +211,6 @@ def logout_page():
     flash("You have been logged out", category='info')
     return redirect(url_for('home_page'))
 
-
-# Custom Error Pages
-# Invalid URL
-@app.errorhandler(404)
-def page_not_found(error):
-    return render_template("404.html"), 404
-
-
-# Internal Server Error
-@app.errorhandler(500)
-def page_not_found(error):
-    return render_template("500.html"), 500
-
 # q = session.query(Item.id).filter(Item.email==email)
 # session.query(q.exists()).scalar()    # returns True or False
 
