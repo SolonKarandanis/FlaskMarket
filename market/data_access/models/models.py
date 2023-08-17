@@ -87,7 +87,7 @@ class Product(ProductTypeBase):
     supplier = db.Column(db.String(length=30), nullable=False)
     description = db.Column(db.Text(), nullable=False)
     price = db.Column(db.Float)
-    types: db.Mapped[Set[Type]] = db.relationship(secondary=product_type)
+    types: db.Mapped[Set[Type]] = db.relationship('Type', secondary=product_type,)
 
     @property
     def inline_types(self):
