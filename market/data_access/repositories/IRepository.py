@@ -6,6 +6,7 @@ class IRepository(ABC):
     def find_all(self):
         raise NotImplementedError
 
+    @abstractmethod
     def find_all_pageable(self, page, rows_per_page: int = 5):
         raise NotImplementedError
 
