@@ -11,7 +11,8 @@ class ProductRepository(IRepository):
             .options(self.db.joinedload(Product.types)).filter_by(id=product_id).first()
 
     def find_all_pageable(self, page, rows_per_page: int = 5):
-        return self.db.session.query(Product).order_by(Product.id).paginate(page=page, per_page=rows_per_page)
+        return self.db.session.query(Product).order_by(Product.id)\
+            .paginate(page=page, per_page=rows_per_page, error_out=False)
 
     def find_all(self):
         pass
