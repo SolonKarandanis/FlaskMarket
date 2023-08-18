@@ -3,15 +3,20 @@ from flask import render_template
 from market import mail
 from market.data_access.models.models import User
 from market import app
+from threading import Thread
 
 
 class EmailService:
+
+    def send_async_email(self, msg):
+        with app.app_context():
+            mail.send(msg)
 
     def send_email(self, subject, sender, recipients, text_body, html_body):
         msg = Message(subject, sender=sender, recipients=recipients)
         msg.body = text_body
         msg.html = html_body
-        mail.send(msg)
+        Thread(target=self.send_async_email, args=( msg)).start()
 
     def send_password_reset_email(self, user: User):
         token = user.get_reset_password_token()
