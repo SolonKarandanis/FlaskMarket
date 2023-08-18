@@ -3,13 +3,14 @@ from datetime import datetime
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
 
-from market.data_access import product_repo, cart_repo, user_repo, order_repo
+from market.data_access import product_repo, order_repo
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
-    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm, ResetPasswordRequestForm
+    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm, ResetPasswordRequestForm, \
+    ResetPasswordForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 
-from market.services import email_service
+from market.services import email_service, cart_service, user_service
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +31,9 @@ def market_page():
 
     if request.method == 'POST':
         user_id = current_user.id
-        cart = cart_repo.find_with_items_by_user_id(user_id)
+        cart = cart_service.find_with_items_by_user_id(user_id)
         if cart is None:
-            cart = cart_repo.create(user_id)
+            cart = cart_service.create(user_id)
 
         for product, product_form in zip(pagination.items, productList_form.products):
             is_selected = product_form.selected.data
@@ -70,9 +71,9 @@ def product_detail_page(product_id):
     product_details_add_to_cart_form = ProductDetailsAddToCartForm()
     if request.method == 'POST':
         user_id = current_user.id
-        cart = cart_repo.find_with_items_by_user_id(user_id)
+        cart = cart_service.find_with_items_by_user_id(user_id)
         if cart is None:
-            cart = cart_repo.create(user_id)
+            cart = cart_service.create(user_id)
         quantity = product_details_add_to_cart_form.quantity.data
         cart.add_item_to_cart(product.id, quantity, product.price)
         db.session.add(cart)
@@ -89,7 +90,7 @@ def product_detail_page(product_id):
 def register_page():
     form = RegisterForm()
     if form.validate_on_submit():
-        user_to_create = user_repo.create(form.username.data, form.email_address.data, form.password1.data)
+        user_to_create = user_service.create(form.username.data, form.email_address.data, form.password1.data)
         db.session.commit()
         return redirect(url_for('market_page'))
     if form.errors != {}:  # If there are not errors from the validations
@@ -109,7 +110,7 @@ def login_page():
         attempted_username = form.username.data
         attempted_password = form.password.data
 
-        attempted_user = user_repo.find_by_username(attempted_username)
+        attempted_user = user_service.find_by_username(attempted_username)
         if attempted_user and attempted_user.check_password_correction(
                 attempted_password
         ):
@@ -129,18 +130,28 @@ def reset_password_request():
 
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        user = user_repo.find_by_email(form.email.data)
+        user = user_service.find_by_email(form.email.data)
         if user:
             email_service.send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password')
         return redirect(url_for('login_page'))
-    return render_template('reset_password.html', form=form)
+    return render_template('reset_password_request.html', form=form)
 
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('home_page'))
+    user = user_service.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('home_page'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.password = form.password.data
+        db.session.commit()
+        flash('Your password has been reset.')
+        return redirect(url_for('login'))
+    return render_template('reset_password.html', form=form)
 
 
 @app.route('/user')
@@ -155,11 +166,11 @@ def profile_page():
 def cart():
     place_draft_order_form = PlaceDraftOrderForm()
     user_id = current_user.id
-    cart = cart_repo.find_with_items_and_products_by_user_id(user_id)
+    cart = cart_service.find_with_items_and_products_by_user_id(user_id)
     if request.method == 'GET':
         cart_items_form = CartItemsForm()
         if cart is None:
-            cart = cart_repo.create(user_id)
+            cart = cart_service.create(user_id)
             try:
                 db.session.commit()
             except:
@@ -192,7 +203,7 @@ def cart():
 @login_required
 def delete_cart_item(item_id):
     user_id = current_user.id
-    cart = cart_repo.find_with_items_by_user_id(user_id)
+    cart = cart_service.find_with_items_by_user_id(user_id)
     cart_item = next(filter(lambda ci: ci.id == item_id, cart.cart_items), None)
     cart.remove_from_cart(cart_item)
     db.session.add(cart)
@@ -207,7 +218,7 @@ def delete_cart_item(item_id):
 @login_required
 def update_cart_item_quantity(item_id):
     user_id = current_user.id
-    cart = cart_repo.find_with_items_by_user_id(user_id)
+    cart = cart_service.find_with_items_by_user_id(user_id)
     s = request.form.get(f'cart_items-{item_id - 1}-quantity')
     logger.info(f's: {request.form}')
     quantity = int(request.form.get(f'cart_items-{item_id - 1}-quantity'))
