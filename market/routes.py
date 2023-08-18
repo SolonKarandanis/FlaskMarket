@@ -127,7 +127,9 @@ def reset_password():
 
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        pass
+        user = user_repo.find_by_email(form.email.data)
+        flash('Check your email for the instructions to reset your password')
+        return redirect(url_for('login_page'))
     return render_template('reset_password.html', form=form)
 
 
