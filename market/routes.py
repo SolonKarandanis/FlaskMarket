@@ -5,7 +5,7 @@ from flask import render_template, redirect, url_for, flash, request
 
 from market.data_access import product_repo, cart_repo, user_repo, order_repo
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
-    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm
+    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm,ResetPasswordRequestForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 
@@ -118,6 +118,17 @@ def login_page():
         else:
             flash('Username and password are not match! Please try again', category='danger')
     return render_template('login.html', form=form)
+
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home_page'))
+
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        pass
+    return render_template('reset_password.html', form=form)
 
 
 @app.route('/user')

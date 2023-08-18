@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, TextAreaField, FieldList, FormField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, TextAreaField, FieldList, \
+    FormField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
 from market.data_access.models.models import User
 
@@ -58,3 +59,8 @@ class CartItemsForm(FlaskForm):
 
 class PlaceDraftOrderForm(FlaskForm):
     comments = TextAreaField()
+
+
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
