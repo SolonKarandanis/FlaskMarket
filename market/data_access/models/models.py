@@ -1,8 +1,9 @@
 from typing import Set, List
 from datetime import datetime
-from market import db, login_manager
-from market import bcrypt
+from market import db, login_manager, app, bcrypt
 from flask_login import UserMixin
+from time import time
+import jwt
 
 
 @login_manager.user_loader
@@ -49,6 +50,20 @@ class User(db.Model, UserMixin):
     def check_password_correction(self, attempted_password: str) -> bool:
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
 
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            userId = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(userId)
+
 
 class ProductTypeBase(db.DeclarativeBase):
     pass
@@ -87,7 +102,7 @@ class Product(ProductTypeBase):
     supplier = db.Column(db.String(length=30), nullable=False)
     description = db.Column(db.Text(), nullable=False)
     price = db.Column(db.Float)
-    types: db.Mapped[Set[Type]] = db.relationship('Type', secondary=product_type,)
+    types: db.Mapped[Set[Type]] = db.relationship('Type', secondary=product_type, )
 
     @property
     def inline_types(self):

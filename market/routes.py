@@ -5,9 +5,11 @@ from flask import render_template, redirect, url_for, flash, request
 
 from market.data_access import product_repo, cart_repo, user_repo, order_repo
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
-    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm,ResetPasswordRequestForm
+    ProductDetailsAddToCartForm, CartItemsForm, CartItemUpdateForm, PlaceDraftOrderForm, ResetPasswordRequestForm
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
+
+from market.services import email_service
 
 logger = logging.getLogger(__name__)
 
@@ -120,17 +122,25 @@ def login_page():
     return render_template('login.html', form=form)
 
 
-@app.route('/reset_password', methods=['GET', 'POST'])
-def reset_password():
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('home_page'))
 
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = user_repo.find_by_email(form.email.data)
+        if user:
+            email_service.send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password')
         return redirect(url_for('login_page'))
     return render_template('reset_password.html', form=form)
+
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home_page'))
 
 
 @app.route('/user')
