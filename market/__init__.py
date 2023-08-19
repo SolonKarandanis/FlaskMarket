@@ -1,12 +1,13 @@
 import logging
 
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from market.config import Config
 from logging.handlers import RotatingFileHandler
+from flask_babel import Babel
 import os
 
 app = Flask(__name__)
@@ -18,10 +19,18 @@ app.jinja_env.globals.update(zip=zip)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 mail = Mail(app)
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login_page'
 login_manager.login_message_category = 'info'
-from market import routes,errors
+from market import routes, errors
+
+
+def get_locale():
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
+
+
+babel = Babel(app, locale_selector=get_locale)
 
 if not app.debug:
     if not os.path.exists('logs'):
