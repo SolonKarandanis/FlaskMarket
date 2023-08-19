@@ -14,3 +14,4 @@ class Config(object):
     ADMINS = ['skarandanis@gmail.com']
 
     LANGUAGES = ['en', 'gr']
+    BABEL_DEFAULT_LOCALE = 'en'

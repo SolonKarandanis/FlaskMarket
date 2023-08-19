@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-08-19 08:50+0300\n"
+"POT-Creation-Date: 2023-08-19 10:22+0300\n"
 "PO-Revision-Date: 2023-08-19 09:06+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -32,10 +32,16 @@ msgstr ""
 
 #: market/templates/404.html:4
 msgid "file_not_found"
-msgstr ""
+msgstr "File not Found"
 
 #: market/templates/base.html:45
 #, python-format
-msgid "Welcome %(username)%s!, username=current_user.username"
+msgid "Welcome %(username)%s"
 msgstr ""
+
+#~ msgid "Welcome %(username)%s!, username=current_user.username"
+#~ msgstr ""
+
+#~ msgid "Welcome %(user_username), user_username=current_user.username"
+#~ msgstr ""
 
