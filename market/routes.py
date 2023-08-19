@@ -2,6 +2,7 @@ from datetime import datetime
 
 from market import app, db
 from flask import render_template, redirect, url_for, flash, request
+from flask_babel import _
 
 from market.data_access import product_repo, order_repo
 from market.forms import RegisterForm, LoginForm, ProductListAddToCartForm, ProductAddToCartForm, \
@@ -47,7 +48,7 @@ def market_page():
             db.session.commit()
             return redirect(url_for('cart'))
         except:
-            flash("Error while adding items to cart")
+            flash(_("Error while adding items to cart"))
 
         return redirect(url_for('market_page'))
 
@@ -81,7 +82,7 @@ def product_detail_page(product_id):
             db.session.commit()
             return redirect(url_for('cart'))
         except:
-            flash("Error while adding items to cart")
+            flash(_("Error while adding items to cart"))
     return render_template('product.html', product=product,
                            product_details_add_to_cart_form=product_details_add_to_cart_form)
 
@@ -95,7 +96,7 @@ def register_page():
         return redirect(url_for('market_page'))
     if form.errors != {}:  # If there are not errors from the validations
         for err_msg in form.errors.values():
-            flash(f'There was an error with creating a user: {err_msg}', category='danger')
+            flash(_('There was an error with creating a user: {err}'.format(err=err_msg)), category='danger')
 
     return render_template('register.html', form=form)
 
